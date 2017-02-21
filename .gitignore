@@ -1,0 +1,3 @@
+#ignorados por git
+*.pyc
+/metin2/settings.py
