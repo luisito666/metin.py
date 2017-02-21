@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %} Salida {% endblock %}
+
+{% block body %} 
+<h3> Bye </h3>
+
+{% if datos.real_name %}
+<p>el usuario {{ datos.real_name }} </p>
+{% else %}
+<p>el usuario {{ datos.login }} </p>
+{% endif %}
+<p> se ha desconectado de forma correcta. </p>
+<p><a href="{% url 'account:login' %}"> Login </a></p>
+
+{% endblock %}

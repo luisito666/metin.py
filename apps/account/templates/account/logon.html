@@ -1,0 +1,49 @@
+{% extends "account/registro.html" %}
+{% load staticfiles %}
+
+    {% block css %}
+    <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet'>
+    <link href='https://cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css' rel='stylesheet'>
+    <link href='{% static "css/normalize.css" %}' rel='stylesheet'>
+    <link href='{% static "css/bootstrap.css" %}' rel='stylesheet'>
+    <link href='{% static "css/app.css" %}' rel='stylesheet'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    {% endblock %}
+
+{% block title %} Metin2 Kai - Dashboard {% endblock %}
+
+{% block pure %}
+    <h3 class="metin">Dashboard </h3>
+    <p>Hola. {{ session.real_name }} </p>
+    <p>Cuenta: {{ session.login }} </p>
+    <p>Coins: {{ session.coins }}
+    <p class="metin">Personajes de la cuenta. </p>
+    <div class="container container-custom ">
+        {% if personajes %}
+        <table class="table table-condensed">
+            <tr>                
+                <td class="color-white">Nombre </td>
+                <td class="color-white">Nivel </td>
+                <td class="color-white">Gremio </td>                
+                <!--<td></td>-->                                    
+            </tr>
+            {% for cosa in personajes %}
+            <tr>               
+                <td class="color-white"> {{ cosa.name }} </td>
+                <td class="color-white"> {{ cosa.level}} </td>
+                <td class="color-white"> {{ cosa.guild_name}} </td>                
+                <!--<td></td>-->
+                                    
+            </tr>        
+            {% endfor %}
+            
+        </table>
+        {% else %}
+        <p> No se encontraron personajes
+        {% endif %}
+
+        <p><a href="{% url 'account:password' %}"> Cambiar Contraseña </a></p>
+        <p><a href="{% url 'account:logout' %}"> Salir </a></p>
+        
+    </div>
+{% endblock %}

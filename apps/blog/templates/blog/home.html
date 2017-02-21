@@ -1,0 +1,15 @@
+{% extends "base_blog.html" %}
+{% load django_markdown %}
+
+{% block blog_entries %}
+{% for object in object_list %}
+  <div class="post">
+    <h2><a href="{% url "blog:entry_detail" slug=object.slug %}">{{ object.titulo }}</a></h2>
+    <p class="meta"> {{ object.creado }} |
+    Etiquetas: {{ object.tags.all|join:", " }}
+
+    </p>
+    {{ object.cuerpo|markdown }}
+  </div>
+{% endfor %}
+{% endblock %}

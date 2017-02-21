@@ -1,0 +1,58 @@
+{% extends "account/registro.html" %}
+{% load staticfiles %}
+
+	{% block css %}
+	<link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet'>
+    <link href='https://cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css' rel='stylesheet'>
+    <link href='{% static "css/normalize.css" %}' rel='stylesheet'>
+    <link href='{% static "css/bootstrap.css" %}' rel='stylesheet'>
+    <link href='{% static "css/app.css" %}' rel='stylesheet'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	{% endblock %}
+
+{% block title %}Metin2 Kai - Descargas{% endblock %}
+
+{% block pure %}
+	<h3 class="metin">Pagina de Descargas </h3>
+	<p class="metin">En esta pagina encontraras la descarga del cliente oficial del juego </p>
+	<div class="container container-custom metin">
+		<table class="table table-bordered table-hover">
+        	<tr>
+            	<td>Opciones </td>
+            	<td>Peso (MB)</td>
+            	<td>Fecha</td>
+            	<td>Link</td>                      				
+            </tr>
+            {% for cosa in descarga %}
+            <tr>
+                <td>{{ cosa.provedor }}</td>
+                <td>{{ cosa.peso}} MB</td>
+                <td>{{ cosa.fecha }} </td>
+                <td><a href="{{ cosa.link }}" target="blank">Link </a></td>
+                      				
+            </tr>        
+            {% endfor %}
+            <!-- <tr>
+                <td>Media Fire</td>
+                <td>1380 GB</td>
+                <td>2016-11-16</td>
+                <td><a href="{{ key.download2 }}" target="blank">Link </a></td>
+                              
+            </tr> -->
+        </table>
+        <!--<table class="table table-hover">
+            <tr>
+                <td>Parche</td>
+                <td>Peso (MB)</td>
+                <td>Fecha</td>
+                <td>Link</td>                             
+            </tr>
+			<tr>
+                <td>Parche Oficial</td>
+                <td>4.17 MB</td>
+                <td>2016-11-16</td>
+                <td><a href="#" target="blank">Link </a></td>
+            </tr>
+        </table> -->
+    </div>
+{% endblock %}

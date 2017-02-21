@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+{% load bootstrap %}
+
+{% block ext %}
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock  %}
+
+{% block title %} Metin2 Kai - Registro {% endblock %}
+
+{% block galeria %}
+	
+{% endblock %}
+
+{% block contenido %} 
+<div class="personalizado" id="content">
+	<div class="oscuro">
+		{% block pure %}
+		<h3 class="metin"> Registro de Cuenta </h3>
+		<p class="metin">Al registrarse aceptas las condiciones de uso de Metin2Kai </p> 
+			<form action="" method="POST" class="form-horizontal metin">
+			{% csrf_token %}
+		    {{ form|bootstrap_horizontal }}
+		    <div class="form-group">
+		      <button type="submit" class="btn btn-primary">Registrar</button>
+		    </div>
+			</form>
+		{% endblock %}
+	</div>
+</div>
+{% endblock %}

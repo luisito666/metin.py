@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+
+
+{% block contenido %}
+  <p>algo de contenido </p>
+  {{ key }}
+  <form action="" method="POST">
+  {% csrf_token %}
+  Usuario:<br>
+  <input type="text" name="login" >
+  <br>
+  Email:<br>
+  <input type="text" name="email" >
+  <br><br>
+  <input type="submit" value="Submit">
+</form>
+{% endblock %}
