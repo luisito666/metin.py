@@ -10,7 +10,7 @@ from captcha.fields import ReCaptchaField
 import re
 
 """
-Diccionarios Espaciales
+Diccionarios Espaciales con mensajes de error
 """
 ERROR_MESSAGES_USER = { 
                         'required': 'el nombre de usuario es requerido',
@@ -32,10 +32,9 @@ ERROR_MESSAGES_EMAIL =  {
                         }               
 
 """
-Funciones que realizan validaciones
+Funciones que realizan validaciones en los formularios
 """
 
-#aqui se realiza validaciones para que no envien campos en blanco al formulario
 def valida_5(value_login):
   if re.search(r'[\s]', value_login):
     raise forms.ValidationError('El login no puede contener espacion en blanco')
@@ -60,7 +59,7 @@ def valida_4(value_social_id):
   if len(str(value_social_id)) >= 8:
     raise forms.ValidationError('el codigo no puede contener mas de 7 caracteres')
 
-
+#Formulario de registro principal
 class CreateUserForm(forms.ModelForm):
   login = forms.CharField(max_length=30, error_messages = ERROR_MESSAGES_USER, validators = [valida_5, valida_6])
   password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
@@ -86,6 +85,8 @@ class CreateUserForm(forms.ModelForm):
       'social_id': _('Codigo de borrado'),
     }
 
+#Formulario que se renderiza en el login
+#este formulario solo se renderiza no se realiza otras labores con el
 class CustomLoginForm(forms.ModelForm):
   login = forms.CharField(max_length=30, validators=[valida_5])
   password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
@@ -101,6 +102,8 @@ class CustomLoginForm(forms.ModelForm):
       'password': 'Contrasena',
     }
 
+#formulario que se renderiza en el cambio de password
+#este formulario solo se renderiza no se realiza otras labores con el
 class CustomChangePassword(forms.ModelForm):
   password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
   new_password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)

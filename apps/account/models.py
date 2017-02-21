@@ -11,6 +11,8 @@ from __future__ import unicode_literals
 from django.utils import timezone
 from django.db import models
 
+#model generado automaticamente por django.
+#si no es compatible con tu base de datos generar uno nuevo
 class Account(models.Model):
     login = models.CharField(unique=True, max_length=30)
     password = models.CharField(max_length=45)
@@ -69,7 +71,7 @@ class Account(models.Model):
     
     def __str__(self):
         return self.login
-
+    #Funcion para encryptar password 
     def micryp(password,other):
         from django.db import connection, transaction
         cursor = connection.cursor()
