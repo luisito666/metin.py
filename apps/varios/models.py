@@ -21,6 +21,6 @@ class Top(models.Model):
     ranking = models.SmallIntegerField(blank=True, null=True)
 
 
-    def __str(self):
+    def __str__(self):
     	return self.name
 
