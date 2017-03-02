@@ -1,22 +1,31 @@
+#importaciones que realiza django por defecto
 from django.shortcuts import render, redirect
+
+#Importando los modelos a usar
 from apps.account.models import Account
-from apps.account.forms import CreateUserForm
-from apps.account.forms import CustomLoginForm
-from apps.account.forms import CustomChangePassword
 from apps.varios.models import Descarga
 from apps.player.models import Guild
 from apps.varios.models import Top
+from django.db.models import Q
 
+#importando los formularios a usar
+from apps.account.forms import CreateUserForm
+from apps.account.forms import CustomLoginForm
+from apps.account.forms import CustomChangePassword
+
+#importando funciones varias para el correcto funcionamiento de la web
 from apps.account.funciones import *
+
+#importando libreria para enviar correo
 from django.core.mail import send_mail
 
+#importando funciones integradas en el framework
 from django.views.generic import CreateView, DetailView, ListView
 from django.http import HttpResponseRedirect , HttpResponse
 from django.core.urlresolvers import reverse_lazy
 
-from django.db.models import Q
 
-
+#clase usada para el registro de usuarios
 class Create(CreateView):
   success_url = reverse_lazy('account:exito')
   template_name = 'account/registro.html'
@@ -36,6 +45,8 @@ class Create(CreateView):
         context['actualmente'] = last_min()
         return context
 
+#funcion usada para el login
+""" es necesario agregar re factorin a esta funcion """
 def login(request):
   form = CustomLoginForm()
   if request.session.has_key('id'):
@@ -59,7 +70,7 @@ def login(request):
       else:        
         context = {'key':'Por favor no deje campos en blanco',}
         return render(request, 'account/login.html', {'context': context, 'form': form})
-      b = a.micryp(request.POST['password']) #uso implicito de cursor   
+      b = a.micryp(request.POST['password']) #uso implicito de cursor para encriptar password   
       if a.password == b:
         request.session['id'] = a.id   
       if request.session.has_key('id'):
@@ -78,6 +89,7 @@ def login(request):
     else:      
       return render(request,'account/login.html', {'form': form, })
 
+#funcion usada para cerra session
 def logout(request):
   try:
     a = Account.objects.get(id=request.session['id'])    
@@ -86,6 +98,7 @@ def logout(request):
     pass
   return render(request, 'account/salir.html', {'datos': a} )
 
+#funcion usada para cambiar password estando logeado
 def changepasswd(request):
   if request.session.has_key('id'):    
     a = Account.objects.get(id=request.session['id'])
@@ -114,12 +127,12 @@ def changepasswd(request):
   else:
   	return redirect('account:login')
 
-#Funciones basicas..
-
+#Funcion usada para confirmar el registro exitoso
 def exito(request):
   context = {}
   return render(request, 'account/exito.html', context)
 
+#funcion usada para la pagina de descarga
 def descarga(request):
   a = Descarga.objects.all()
   context = { 
@@ -136,6 +149,7 @@ def descarga(request):
   context = { 'player': a}
   return render(request,'account/top100.html', context)
 """
+#clase usada para renderizar el TOP del juego y paginarlo
 class top(ListView):
   model = Top
   template_name = 'account/top100.html'
@@ -151,7 +165,8 @@ class top(ListView):
         context['online'] = last_hour()
         context['actualmente'] = last_min()
         return context
-  
+
+#clase usada para renderizar el top del juego y paginarlo
 class top_g(ListView):
   model = Guild
   template_name = 'account/top_g.html'
@@ -166,6 +181,8 @@ class top_g(ListView):
         context['actualmente'] = last_min()
         return context
 
+#Funcion usada para recuperar password por correo
+"""Realizar refactorin a esta funcion """
 def recuperar_password(request):
   #validando los datos que se envian por post
     if request.method == 'POST':
@@ -178,7 +195,7 @@ def recuperar_password(request):
         return render(request, 'account/rescue.html', context)
 
       if usuario.email == b:
-        key = aleatorio(20)
+        key = aleatorio(40)
         usuario.address = key
         usuario.save()
         mensaje ='Hola %s' % usuario.real_name
@@ -192,20 +209,62 @@ def recuperar_password(request):
           'soporte@metin2kai.co',
           [usuario.email],
           fail_silently=False,
-          )"""
-        from django.core.mail import EmailMessage
-        EmailMessage(
-          'Recuperar password',
-          mensaje,
-          to = [usuario.email],
-          )
-
-        context = {'key': 'se ha enviado un correo electronico con las instrucciones para recupear el password'}
+          )"""        
+        try:
+            send_mail(
+              'Recuperar password',
+              mensaje,
+              'tottotesting@gmail.com',
+              [usuario.email],              
+            )
+  
+            context = {'key': 'se ha enviado un correo electronico con las instrucciones para recupear el password'}
+            return render(request, 'account/rescue.html', context)
+        except:
+            context = {'key': 'Error enviando el correo xD'}
+            return render(request, 'account/rescue.html', context)
+      else:
+        context = {'key': 'El usuario no concuerda con el correo electronico'}
         return render(request, 'account/rescue.html', context)
     else:
-      context = {'key': 'estoy aca?'}
+      context = {'key': 'Formulario django'}
       return render(request, 'account/rescue.html', context)
 
+def process_password(request,url):
+  if request.method == 'GET':
+    try:
+      a = Account.objects.get(address=url)
+    except:
+      context = {'key': 'El token que intentas usar ya expiro'}
+      return render(request, 'account/rescue.html', context)
 
-
-
+    request.session['tmp_id'] = a.id
+    context = {
+      'form': form
+    }
+    return render(request, 'template_' , context)
+  
+  if request.method == 'POST':
+    password = request.POST['password']
+    password_again = request.POST['password_again']
+    if password == password_again:
+      if request.session.has_key('tmp_id'):
+        try:
+          a = Account.objects.get(id=request.session['tmp_id'])
+        except:
+          context = {'key': 'No se encuentra el usuario'}
+          return render(request, 'template', context)
+        a.password = a.micryp(password)
+        a.address = aleatorio(40)
+        a.save()
+        context = {'key': 'Password actualizado correctamente'}
+        return render(request, 'template', context)
+      else:
+        context = {'key': 'No existe la session temporal'}
+        return render(request, 'template', )
+    else:
+      context = {
+        'form': form
+        'key':'Los password no coinciden'
+      }
+      return render(request, 'template', context)
