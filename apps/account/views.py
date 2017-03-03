@@ -3,15 +3,12 @@ from django.shortcuts import render, redirect
 
 #Importando los modelos a usar
 from apps.account.models import Account
-from apps.varios.models import Descarga
+from apps.varios.models import Descarga, Top
 from apps.player.models import Guild
-from apps.varios.models import Top
 from django.db.models import Q
 
 #importando los formularios a usar
-from apps.account.forms import CreateUserForm
-from apps.account.forms import CustomLoginForm
-from apps.account.forms import CustomChangePassword
+from apps.account.forms import CreateUserForm, CustomLoginForm, CustomChangePassword
 
 #importando funciones varias para el correcto funcionamiento de la web
 from apps.account.funciones import *
@@ -232,18 +229,21 @@ def recuperar_password(request):
 
 def process_password(request,url):
   if request.method == 'GET':
-    try:
-      a = Account.objects.get(address=url)
-    except:
-      context = {'key': 'El token que intentas usar ya expiro'}
-      return render(request, 'account/rescue.html', context)
-
-    request.session['tmp_id'] = a.id
-    context = {
-      'form': form
-    }
-    return render(request, 'template_' , context)
+    if url:
+      try:
+        a = Account.objects.get(address=url)
+      except:
+        context = {'key': 'El token que intentas usar ya expiro'}
+        return render(request, 'account/cambio_passwd.html', context)
   
+      request.session['tmp_id'] = a.id
+      context = {
+        'key': 'ingresa tu nuevo password'
+      }
+      return render(request, 'account/cambio_passwd.html' , context)
+    else:
+      context = {'key': 'No has enviado ningun token'}
+      return render(request, 'account/cambio_passwd.html', context)
   if request.method == 'POST':
     password = request.POST['password']
     password_again = request.POST['password_again']
@@ -253,18 +253,19 @@ def process_password(request,url):
           a = Account.objects.get(id=request.session['tmp_id'])
         except:
           context = {'key': 'No se encuentra el usuario'}
-          return render(request, 'template', context)
+          return render(request, 'account/cambio_passwd.html', context)
         a.password = a.micryp(password)
         a.address = aleatorio(40)
         a.save()
+        del request.session['tmp_id']
         context = {'key': 'Password actualizado correctamente'}
-        return render(request, 'template', context)
+        return render(request, 'account/cambio_passwd.html', context)
       else:
         context = {'key': 'No existe la session temporal'}
-        return render(request, 'template', )
+        return render(request, 'account/cambio_passwd.html', )
     else:
       context = {
-        'form': form
-        'key':'Los password no coinciden'
+        'form': form,
+        'key':'Los password no coinciden',
       }
-      return render(request, 'template', context)
+      return render(request, 'account/cambio_passwd.html', context)

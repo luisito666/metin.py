@@ -1,0 +1,29 @@
+{% extends "index.html" %}
+{% load bootstrap %}
+
+{% block title %} Metin2 Kai - Recuperar password {% endblock %}
+
+{% block galeria %}
+  
+{% endblock %}
+
+{% block contenido %}
+<div class="personalizado" id="content">
+    <p>Diligencia el formulario</p>
+    
+    {% if key %}
+    {{ key }}
+    {% endif %}
+    
+    <form action="" method="POST">
+      {% csrf_token %}
+      Usuario:<br>
+      <input type="password" name="password" >
+      <br>
+      Email:<br>
+      <input type="password" name="password_again" >
+      <br><br>
+      <input type="submit" value="Enviar">
+    </form>
+</div>
+{% endblock %}
