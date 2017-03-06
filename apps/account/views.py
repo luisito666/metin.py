@@ -20,7 +20,10 @@ from django.core.mail import send_mail
 from django.views.generic import CreateView, DetailView, ListView
 from django.http import HttpResponseRedirect , HttpResponse
 from django.core.urlresolvers import reverse_lazy
+from django.utils import timezone 
 
+#importando las configuracines de django
+from metin2 import settings
 
 #clase usada para el registro de usuarios
 class Create(CreateView):
@@ -194,12 +197,13 @@ def recuperar_password(request):
       if usuario.email == b:
         key = aleatorio(40)
         usuario.address = key
+        #usuario.token_expire = timezone.now() 
         usuario.save()
-        mensaje ='Hola %s' % usuario.real_name
-        mensaje+='has solicitado un email para recuperar el password'
-        mensaje+='para proceder usa el siguiente <a href="https://www1.metin2kai.co/password/%s">link</a>' % key
-        mensaje+='si no has solicitado el dicho cambio ignorar este correo'
-        mensaje+='att: staff metin2kai.'
+        mensaje ='<h3> Hola %s </h3>' % usuario.real_name
+        mensaje+='<p>has solicitado un email para recuperar el password </p>'
+        mensaje+='<p>para proceder usa el siguiente <a href="https://www1.metin2kai.co/password/%s">link</a> </p>' % key
+        mensaje+='<p>si no has solicitado el dicho cambio ignorar este correo </p>'
+        mensaje+='<p> Att: Staff <strong>Metin2kai </strong> </p>'
         """send_mail(
           'recuperacion de password',
           mensaje, 
@@ -210,21 +214,22 @@ def recuperar_password(request):
         try:
             send_mail(
               'Recuperar password',
-              mensaje,
-              'tottotesting@gmail.com',
-              [usuario.email],              
+              'Content',              
+              settings.EMAIL_HOST_USER ,
+              [usuario.email], 
+              html_message=mensaje,            
             )
   
             context = {'key': 'se ha enviado un correo electronico con las instrucciones para recupear el password'}
             return render(request, 'account/rescue.html', context)
         except:
-            context = {'key': 'Error enviando el correo xD'}
+            context = {'key': 'Error enviando el correo'}
             return render(request, 'account/rescue.html', context)
       else:
         context = {'key': 'El usuario no concuerda con el correo electronico'}
         return render(request, 'account/rescue.html', context)
     else:
-      context = {'key': 'Formulario django'}
+      context = {'key': ''}
       return render(request, 'account/rescue.html', context)
 
 def process_password(request,url):

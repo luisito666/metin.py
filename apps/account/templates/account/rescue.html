@@ -2,16 +2,21 @@
 
 
 {% block contenido %}
-  <p>algo de contenido </p>
-  {{ key }}
-  <form action="" method="POST">
+  <p>Usa el siguiente formulario para recuperar tu contraseña</p>
+  {% if key %}
+  <p>Mensaje: <strong> {{ key }} </strong> <p>
+  {% endif %}  
+  <form action="" method="POST" class="">
   {% csrf_token %}
-  Usuario:<br>
-  <input type="text" name="login" >
-  <br>
-  Email:<br>
-  <input type="text" name="email" >
-  <br><br>
-  <input type="submit" value="Submit">
+  <div class="form-group">
+    <label> Usuario: </label>
+    <input type="text" name="login" placeholder="Usuario" >
+  </div>  
+  <div class="form-group">
+    <label>Email:</label>
+    <input type="text" name="email" placeholder="Email" >
+  </div>
+  <button type="submit" class="btn btn-primary"> Enviar </button>
 </form>
+
 {% endblock %}

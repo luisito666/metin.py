@@ -1,5 +1,6 @@
 -- Agregar funciones de recuperar password via email.
 -- Acomodar algunas vistas en html. cambio de password, recuperar password, otras.
+-- Agregar correo de activacion de cuentas
 -- Arreglar bug del blog con el appconfig
 -- Refactorizar algunas funciones del proyecto para un mejor rendimiento.
 -- Agregar comentarios en todos los archivos del proyecto.
