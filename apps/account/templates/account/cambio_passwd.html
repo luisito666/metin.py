@@ -9,21 +9,27 @@
 
 {% block contenido %}
 <div class="personalizado" id="content">
-    <p>Diligencia el formulario</p>
-    
+  <div class="oscuro">
+    {% if if_form %}
+    <p>Diligencia el formulario</p> 
     {% if key %}
-    {{ key }}
-    {% endif %}
-    
+        <p> Mensaje: <strong>{{ key }}</strong> </p>
+    {% endif %}   
     <form action="" method="POST">
       {% csrf_token %}
-      Usuario:<br>
+      Password:<br>
       <input type="password" name="password" >
       <br>
-      Email:<br>
+      Confirmar Password:<br>
       <input type="password" name="password_again" >
       <br><br>
       <input type="submit" value="Enviar">
     </form>
+    {% else %}
+      {% if key %}
+        <p> Mensaje: <strong>{{ key }}</strong> </p>
+      {% endif %}
+    {% endif %}
+    </div>
 </div>
 {% endblock %}

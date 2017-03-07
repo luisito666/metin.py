@@ -1,6 +1,7 @@
 from apps.account.models import Account
 from apps.player.models import Player
 from django.db import connections
+from django.utils import timezone
 
 """Esta funcion es para ver cuantas cuentas tiene el server """
 def total_us():
@@ -43,3 +44,10 @@ def aleatorio(cantidad):
 
 	retorno = p
 	return retorno
+
+"""def token_time(now, token):
+	dia = (now - token).days
+	if dia >= 1:
+		return False
+	else:
+		return True"""

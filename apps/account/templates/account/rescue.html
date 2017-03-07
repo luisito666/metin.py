@@ -2,11 +2,14 @@
 
 
 {% block contenido %}
-  <p>Usa el siguiente formulario para recuperar tu contraseña</p>
+<div class="personalizado" id="content">
+  <div class="oscuro">
+  <h3 class="metin">Restablecer Password</h3>
+  <p class="metin">Usa el siguiente formulario para recuperar tu password</p>
   {% if key %}
-  <p>Mensaje: <strong> {{ key }} </strong> <p>
+  <p>Mensaje: <strong> {{ key }} </strong> </p>
   {% endif %}  
-  <form action="" method="POST" class="">
+  <form action="" method="POST" class="metin">
   {% csrf_token %}
   <div class="form-group">
     <label> Usuario: </label>
@@ -18,5 +21,6 @@
   </div>
   <button type="submit" class="btn btn-primary"> Enviar </button>
 </form>
-
+</div>
+</div>
 {% endblock %}

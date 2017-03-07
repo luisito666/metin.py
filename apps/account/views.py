@@ -197,7 +197,7 @@ def recuperar_password(request):
       if usuario.email == b:
         key = aleatorio(40)
         usuario.address = key
-        #usuario.token_expire = timezone.now() 
+        usuario.token_expire = timezone.now() 
         usuario.save()
         mensaje ='<h3> Hola %s </h3>' % usuario.real_name
         mensaje+='<p>has solicitado un email para recuperar el password </p>'
@@ -238,16 +238,30 @@ def process_password(request,url):
       try:
         a = Account.objects.get(address=url)
       except:
-        context = {'key': 'El token que intentas usar ya expiro'}
+        context = {
+          'key': 'El token que intentas usar no existe',
+          'if_form': False
+        }
         return render(request, 'account/cambio_passwd.html', context)
-  
-      request.session['tmp_id'] = a.id
-      context = {
-        'key': 'ingresa tu nuevo password'
-      }
-      return render(request, 'account/cambio_passwd.html' , context)
+      z = (timezone.now() - a.token_expire).days
+      if z >= 1:
+        context = {
+          'key': 'El token que intentas usar esta vencido',
+          'if_form': False
+          }
+        return render(request, 'account/cambio_passwd.html' , context)        
+      else:
+        request.session['tmp_id'] = a.id
+        context = {
+          'key': 'ingresa tu nuevo password',
+          'if_form': True
+        }
+        return render(request, 'account/cambio_passwd.html' , context)        
     else:
-      context = {'key': 'No has enviado ningun token'}
+      context = {
+        'key': 'No has enviado ningun token',
+        'if_form': True
+      }
       return render(request, 'account/cambio_passwd.html', context)
   if request.method == 'POST':
     password = request.POST['password']
@@ -267,7 +281,7 @@ def process_password(request,url):
         return render(request, 'account/cambio_passwd.html', context)
       else:
         context = {'key': 'No existe la session temporal'}
-        return render(request, 'account/cambio_passwd.html', )
+        return render(request, 'account/cambio_passwd.html', context )
     else:
       context = {
         'form': form,
