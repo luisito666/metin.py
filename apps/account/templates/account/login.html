@@ -46,11 +46,12 @@
 		    				</div>
 					</form>
                 </div>
+                {% if key %}
+                    <p class="metin2"> {{ key }} </p>
+                {% endif %}
                 <div class="panel-footer">
-                    No esta registrado? <a href="{% url 'account:create' %}#content">Registrese aqui</a>
-					{% if context.key %}
-						<p> {{ context.key }} </p>
-					{% endif %}
+                    No esta registrado? <a href="{% url 'account:create' %}#content">Registrese aqui</a><br>
+                    <a href="{% url 'account:request' %}"> Recuperar password</a>					
                     </div>
             </div>
         </div>

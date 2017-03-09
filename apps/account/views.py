@@ -8,7 +8,7 @@ from apps.player.models import Guild
 from django.db.models import Q
 
 #importando los formularios a usar
-from apps.account.forms import CreateUserForm, CustomLoginForm, CustomChangePassword
+from apps.account.forms import CreateUserForm, CustomLoginForm, CustomChangePassword, ResPassword
 
 #importando funciones varias para el correcto funcionamiento de la web
 from apps.account.funciones import *
@@ -48,46 +48,62 @@ class Create(CreateView):
 #funcion usada para el login
 """ es necesario agregar re factorin a esta funcion """
 def login(request):
-  form = CustomLoginForm()
+  form = CustomLoginForm(request.POST or None)
   if request.session.has_key('id'):
     a = Account.objects.get(id=request.session['id'])
     b = Top.objects.filter(account_id=a.id)
-    return render(request, 'account/logon.html',{	'session': a ,     												
-    												'personajes': b,
-    												'player': total_pl(),
-    												'account': total_us(),
-    												'online': last_hour(), 
-    												'actualmente': last_min(),
-    											})
+    context = { 
+          'session': a ,                            
+          'personajes': b,
+          'player': total_pl(),
+          'account': total_us(),
+          'online': last_hour(), 
+          'actualmente': last_min(),
+    }
+    return render(request, 'account/logon.html', context)
   else: 
     if request.method == 'POST':  #Validando que los datos vengan por post
-      if request.POST['login'] and request.POST['password']:       
+      if form.is_valid():       
         try:
           a = Account.objects.get(login=request.POST['login'])  #obteniendo datos de usuario
         except Account.DoesNotExist:          
-          context = {'key':'El nombre de usuario no existe',}
-          return render(request, 'account/login.html', {'context': context, 'form': form})
+          context = {
+                'key':'El nombre de usuario no existe',
+                'form': form
+          }
+          return render(request, 'account/login.html', context)
       else:        
-        context = {'key':'Por favor no deje campos en blanco',}
-        return render(request, 'account/login.html', {'context': context, 'form': form})
+        context = {
+                'key':'Por favor no deje campos en blanco',
+                'form': form
+        }
+        return render(request, 'account/login.html', context )
       b = a.micryp(request.POST['password']) #uso implicito de cursor para encriptar password   
       if a.password == b:
         request.session['id'] = a.id   
       if request.session.has_key('id'):
         b = Top.objects.filter(account_id=a.id)
-        return render(request, 'account/logon.html', {
-        												'session': a , 
-        												'personajes': b,
-        												'player': total_pl(), 
-        												'account': total_us(), 
-        												'online': last_hour(), 
-        												'actualmente': last_min(), 
-        											 })
+        context = {
+              'session': a , 
+              'personajes': b,
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(), 
+        }
+        return render(request, 'account/logon.html', context )
       else:        
-        context = {'key':'Nombre de usuario o password incorrecto',}
-        return render(request, 'account/login.html', {'context': context, 'form': form})      
-    else:      
-      return render(request,'account/login.html', {'form': form, })
+        context = {
+              'key':'Nombre de usuario o password incorrecto',
+              'form': form
+        }
+        return render(request, 'account/login.html',  context, )      
+    else:
+      context = {
+              'key': '',
+              'form': form
+      }      
+      return render(request,'account/login.html', context)
 
 #funcion usada para cerra session
 def logout(request):
@@ -141,7 +157,7 @@ def descarga(request):
               'account': total_us(), 
               'online': last_hour(), 
               'actualmente': last_min(),
-            }
+  }
   return render(request, 'account/download.html', context)
 
 """def top100(request):
@@ -184,14 +200,17 @@ class top_g(ListView):
 #Funcion usada para recuperar password por correo
 """Realizar refactorin a esta funcion """
 def recuperar_password(request):
-  #validando los datos que se envian por post
-    if request.method == 'POST':
+    form = ResPassword(request.POST or None)
+    #validando los datos que se envian por post
+    if request.method == 'POST' and form.is_valid():      
       a = request.POST['login']
       b = request.POST['email']
       try:
         usuario = Account.objects.get(login=a)
       except Account.DoesNotExist:
-        context = {'key': 'No se encuentran registros en nuestra base de datos'}
+        context = {
+              'key': 'No se encuentran registros en nuestra base de datos',
+              'form': form }
         return render(request, 'account/rescue.html', context)
 
       if usuario.email == b:
@@ -220,16 +239,28 @@ def recuperar_password(request):
               html_message=mensaje,            
             )
   
-            context = {'key': 'se ha enviado un correo electronico con las instrucciones para recupear el password'}
+            context = {
+                    'key': 'se ha enviado un correo electronico con las instrucciones para recupear el password',
+                    'form': form
+            }
             return render(request, 'account/rescue.html', context)
         except:
-            context = {'key': 'Error enviando el correo'}
+            context = {
+                  'key': 'Error enviando el correo',
+                  'form': form
+            }
             return render(request, 'account/rescue.html', context)
       else:
-        context = {'key': 'El usuario no concuerda con el correo electronico'}
+        context = {
+              'key': 'El usuario no concuerda con el correo electronico',
+              'form': form
+              }
         return render(request, 'account/rescue.html', context)
     else:
-      context = {'key': ''}
+      context = {
+            'key': '', 
+            'form': form
+      }
       return render(request, 'account/rescue.html', context)
 
 def process_password(request,url):
@@ -260,7 +291,7 @@ def process_password(request,url):
     else:
       context = {
         'key': 'No has enviado ningun token',
-        'if_form': True
+        'if_form': False
       }
       return render(request, 'account/cambio_passwd.html', context)
   if request.method == 'POST':
@@ -277,14 +308,20 @@ def process_password(request,url):
         a.address = aleatorio(40)
         a.save()
         del request.session['tmp_id']
-        context = {'key': 'Password actualizado correctamente'}
+        context = {
+              'key': 'Password actualizado correctamente'
+              'if_form': False
+        }
         return render(request, 'account/cambio_passwd.html', context)
       else:
-        context = {'key': 'No existe la session temporal'}
+        context = {
+              'key': 'No existe la session temporal'
+              'if_form': False
+        }
         return render(request, 'account/cambio_passwd.html', context )
     else:
       context = {
-        'form': form,
+        'if_form': True,
         'key':'Los password no coinciden',
       }
       return render(request, 'account/cambio_passwd.html', context)

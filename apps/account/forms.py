@@ -87,10 +87,12 @@ class CreateUserForm(forms.ModelForm):
 
 #Formulario que se renderiza en el login
 #este formulario solo se renderiza no se realiza otras labores con el
-class CustomLoginForm(forms.ModelForm):
+class CustomLoginForm(forms.Form):
   login = forms.CharField(max_length=30, validators=[valida_5])
   password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
+  capcha = ReCaptchaField()
 
+  """
   class Meta:
     model = Account
     fields = [
@@ -100,7 +102,7 @@ class CustomLoginForm(forms.ModelForm):
     labels = {
       'login': 'Nombre de Usuario',
       'password': 'Contrasena',
-    }
+    }"""
 
 #formulario que se renderiza en el cambio de password
 #este formulario solo se renderiza no se realiza otras labores con el
@@ -114,3 +116,19 @@ class CustomChangePassword(forms.ModelForm):
     fields = [      
       'password',
     ]
+
+class ResPassword(forms.Form):
+  login = forms.CharField(max_length=30, validators=[valida_5])
+  email = forms.CharField(max_length=30, validators = [valida_5] ,error_messages = ERROR_MESSAGES_PASSWORD)
+  capcha = ReCaptchaField()
+  """
+  class Meta:
+    model = Account
+    fields = [
+      'login',
+      'email',
+    ]
+    labels = {
+      'login': 'Nombre de Usuario',
+      'email': 'Correo electronico',
+    }"""

@@ -1,5 +1,9 @@
 {% extends "index.html" %}
+{% load bootstrap %}
 
+{% block galeria %}
+  
+{% endblock %}
 
 {% block contenido %}
 <div class="personalizado" id="content">
@@ -9,18 +13,13 @@
   {% if key %}
   <p>Mensaje: <strong> {{ key }} </strong> </p>
   {% endif %}  
-  <form action="" method="POST" class="metin">
-  {% csrf_token %}
-  <div class="form-group">
-    <label> Usuario: </label>
-    <input type="text" name="login" placeholder="Usuario" >
-  </div>  
-  <div class="form-group">
-    <label>Email:</label>
-    <input type="text" name="email" placeholder="Email" >
-  </div>
-  <button type="submit" class="btn btn-primary"> Enviar </button>
-</form>
+  <form action="" method="POST" class="form-horizontal metin">
+      {% csrf_token %}
+        {{ form|bootstrap_horizontal }}
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Enviar</button>
+        </div>
+      </form>
 </div>
 </div>
 {% endblock %}
