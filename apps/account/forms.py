@@ -1,10 +1,20 @@
+#importaciones que se realizan por defecto
 from django import forms
+
+#importando lo modelos que se usaran en los formularios
 from django.contrib.auth.models import User
 from apps.account.models import Account
+
+#importando los modelos de django
 from django.db import models
-from datetime import datetime   
+
+#importando datetime
+from datetime import datetime
+
+#importando funcion daa
 from django.utils.translation import ugettext_lazy as _
 
+#importando el capcha de los formularios
 from captcha.fields import ReCaptchaField
 
 import re
@@ -59,6 +69,10 @@ def valida_4(value_social_id):
   if len(str(value_social_id)) >= 8:
     raise forms.ValidationError('el codigo no puede contener mas de 7 caracteres')
 
+
+""" Este formulario por la herencia que tiene form.ModelForm si necesita un modelo para su funcionamiento
+de lo contrario no funcionara """
+
 #Formulario de registro principal
 class CreateUserForm(forms.ModelForm):
   login = forms.CharField(max_length=30, error_messages = ERROR_MESSAGES_USER, validators = [valida_5, valida_6])
@@ -85,50 +99,27 @@ class CreateUserForm(forms.ModelForm):
       'social_id': _('Codigo de borrado'),
     }
 
-#Formulario que se renderiza en el login
-#este formulario solo se renderiza no se realiza otras labores con el
+"""Los siguiente formularios heredan de la clase forms.Form por lo que no necesitan 
+de un modelo para su funcionamiento  """
+
+#Este formulario se usa para el login
 class CustomLoginForm(forms.Form):
   login = forms.CharField(max_length=30, validators=[valida_5])
   password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
   capcha = ReCaptchaField()
 
-  """
-  class Meta:
-    model = Account
-    fields = [
-      'login',
-      'password',
-    ]
-    labels = {
-      'login': 'Nombre de Usuario',
-      'password': 'Contrasena',
-    }"""
-
-#formulario que se renderiza en el cambio de password
-#este formulario solo se renderiza no se realiza otras labores con el
-class CustomChangePassword(forms.ModelForm):
+#Este es el formulario que usaremos para el cambio de password
+class CustomChangePassword(forms.Form):
   password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
   new_password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
   new_password_again = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
 
-  class Meta:
-    model = Account
-    fields = [      
-      'password',
-    ]
-
+#Este formulario se usa para recuperar password por correo
 class ResPassword(forms.Form):
   login = forms.CharField(max_length=30, validators=[valida_5])
   email = forms.CharField(max_length=30, validators = [valida_5] ,error_messages = ERROR_MESSAGES_PASSWORD)
   capcha = ReCaptchaField()
-  """
-  class Meta:
-    model = Account
-    fields = [
-      'login',
-      'email',
-    ]
-    labels = {
-      'login': 'Nombre de Usuario',
-      'email': 'Correo electronico',
-    }"""
+  
+class FormResetPassword(forms.Form):
+  password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)
+  password_again = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD) 

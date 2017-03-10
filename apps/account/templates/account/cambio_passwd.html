@@ -15,16 +15,13 @@
     {% if key %}
         <p> Mensaje: <strong>{{ key }}</strong> </p>
     {% endif %}   
-    <form action="" method="POST">
+      <form action="" method="POST" class="form-horizontal metin">
       {% csrf_token %}
-      Password:<br>
-      <input type="password" name="password" >
-      <br>
-      Confirmar Password:<br>
-      <input type="password" name="password_again" >
-      <br><br>
-      <input type="submit" value="Enviar">
-    </form>
+        {{ form|bootstrap_horizontal }}
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Enviar</button>
+        </div>
+      </form>
     {% else %}
       {% if key %}
         <p> Mensaje: <strong>{{ key }}</strong> </p>

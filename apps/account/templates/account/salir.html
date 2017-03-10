@@ -10,14 +10,16 @@
 
 {% block contenido %} 
 <div class="personalizado" id="content">
-	<h3> Bye </h3>
+	<div class="oscuro">
+	<h3 class="metin"> Logout </h3>
 
 	{% if datos.real_name %}
-	<p>el usuario {{ datos.real_name }} </p>
+	<p class="metin">el usuario {{ datos.real_name }} </p>
 	{% else %}
-	<p>el usuario {{ datos.login }} </p>
+	<p class="metin">el usuario {{ datos.login }} </p>
 	{% endif %}
-	<p> se ha desconectado de forma correcta. </p>
-	<p><a href="{% url 'account:login' %}"> Login </a></p>
+	<p class="metin"> se ha desconectado de forma correcta. </p>
+	<p><a class="metin" href="{% url 'account:login' %}"> Login </a></p>
+	</div>
 </div>
 {% endblock %}

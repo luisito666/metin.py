@@ -8,7 +8,11 @@ from apps.player.models import Guild
 from django.db.models import Q
 
 #importando los formularios a usar
-from apps.account.forms import CreateUserForm, CustomLoginForm, CustomChangePassword, ResPassword
+from apps.account.forms import  CreateUserForm, \
+                                CustomLoginForm, \
+                                CustomChangePassword,\
+                                ResPassword, \
+                                FormResetPassword
 
 #importando funciones varias para el correcto funcionamiento de la web
 from apps.account.funciones import *
@@ -108,37 +112,66 @@ def login(request):
 #funcion usada para cerra session
 def logout(request):
   try:
-    a = Account.objects.get(id=request.session['id'])    
+    a = Account.objects.get(id=request.session['id'])
     del request.session['id']
   except:
-    pass
+    a = {'datos': 'nodata'}
   return render(request, 'account/salir.html', {'datos': a} )
 
 #funcion usada para cambiar password estando logeado
 def changepasswd(request):
+  form = CustomChangePassword(request.POST or None)
   if request.session.has_key('id'):    
-    a = Account.objects.get(id=request.session['id'])
-    if request.method == 'POST':
-    	form = CustomChangePassword(request.POST)
+    try:
+      a = Account.objects.get(id=request.session['id'])
+    except Account.DoesNotExist:
+      pass
+    if request.method == 'POST':    	
     	if request.POST['new_password'] == request.POST['new_password_again']:
     		if a.password == a.micryp(request.POST['password']):
-    			if form.is_valid():
-    				#post = form.save(commit=False)
+    			if form.is_valid():    				
     				new_password = a.micryp( request.POST['new_password'] )
     				a.password = new_password
     				a.save()
-    				context = { 'key':'pass existo', }
-    				return render(request, 'account/password.html', {'context': context ,'form': CustomChangePassword() } )
+    				context = { 
+                  'key':'se ha cambiado el password exitosamente.', 
+                  'form': form,
+                  'player': total_pl(), 
+                  'account': total_us(), 
+                  'online': last_hour(), 
+                  'actualmente': last_min(),
+            }
+    				return render(request, 'account/password.html', context )
     		else:
-    			context = { 'key':'Contrasea erronea' }
-    			return render(request, 'account/password.html', {'context': context ,'form': CustomChangePassword() } )
+    			context = { 
+                'key':'El password no es correcto', 
+                'form': form,
+                'player': total_pl(), 
+                'account': total_us(), 
+                'online': last_hour(), 
+                'actualmente': last_min(),
+          }
+    			return render(request, 'account/password.html', context )
     	else:
     		#'contraseas no coinciden'
-    		context = { 'key':'las nuevas contraseas no coinciden' }
-    		return render(request, 'account/password.html', {'context': context ,'form': CustomChangePassword() } )
+    		context = { 
+              'key':'Los password no coinciden' ,
+              'form': form,
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
+        }        
+    		return render(request, 'account/password.html', context )
     else:
-    	form = CustomChangePassword()
-    	return render(request, 'account/password.html' , {'form': form})
+    	context = {
+            'form': form,
+            'player': total_pl(), 
+            'account': total_us(), 
+            'online': last_hour(), 
+            'actualmente': last_min(),
+      }
+    	return render(request, 'account/password.html' , context )
 
   else:
   	return redirect('account:login')
@@ -210,7 +243,12 @@ def recuperar_password(request):
       except Account.DoesNotExist:
         context = {
               'key': 'No se encuentran registros en nuestra base de datos',
-              'form': form }
+              'form': form ,
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
+        }
         return render(request, 'account/rescue.html', context)
 
       if usuario.email == b:
@@ -241,29 +279,46 @@ def recuperar_password(request):
   
             context = {
                     'key': 'se ha enviado un correo electronico con las instrucciones para recupear el password',
-                    'form': form
+                    'form': form,
+                    'player': total_pl(), 
+                    'account': total_us(), 
+                    'online': last_hour(), 
+                    'actualmente': last_min(),
             }
             return render(request, 'account/rescue.html', context)
         except:
             context = {
                   'key': 'Error enviando el correo',
-                  'form': form
+                  'form': form,
+                  'player': total_pl(), 
+                  'account': total_us(), 
+                  'online': last_hour(), 
+                  'actualmente': last_min(),
             }
             return render(request, 'account/rescue.html', context)
       else:
         context = {
               'key': 'El usuario no concuerda con el correo electronico',
-              'form': form
-              }
+              'form': form,
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
+        }
         return render(request, 'account/rescue.html', context)
     else:
       context = {
             'key': '', 
-            'form': form
+            'form': form,
+            'player': total_pl(), 
+            'account': total_us(), 
+            'online': last_hour(), 
+            'actualmente': last_min(),
       }
       return render(request, 'account/rescue.html', context)
 
 def process_password(request,url):
+  form = FormResetPassword(request.POST or None)
   if request.method == 'GET':
     if url:
       try:
@@ -271,57 +326,94 @@ def process_password(request,url):
       except:
         context = {
           'key': 'El token que intentas usar no existe',
-          'if_form': False
+          'if_form': False,
+          'player': total_pl(), 
+          'account': total_us(), 
+          'online': last_hour(), 
+          'actualmente': last_min(),
         }
         return render(request, 'account/cambio_passwd.html', context)
       z = (timezone.now() - a.token_expire).days
       if z >= 1:
         context = {
           'key': 'El token que intentas usar esta vencido',
-          'if_form': False
-          }
+          'if_form': False,
+          'player': total_pl(), 
+          'account': total_us(), 
+          'online': last_hour(), 
+          'actualmente': last_min(),
+        }
         return render(request, 'account/cambio_passwd.html' , context)        
       else:
         request.session['tmp_id'] = a.id
         context = {
           'key': 'ingresa tu nuevo password',
-          'if_form': True
+          'form': form,
+          'if_form': True,
+          'player': total_pl(), 
+          'account': total_us(), 
+          'online': last_hour(), 
+          'actualmente': last_min(),
         }
         return render(request, 'account/cambio_passwd.html' , context)        
     else:
       context = {
         'key': 'No has enviado ningun token',
-        'if_form': False
+        'if_form': False,
+        'player': total_pl(), 
+        'account': total_us(), 
+        'online': last_hour(), 
+        'actualmente': last_min(),
       }
       return render(request, 'account/cambio_passwd.html', context)
   if request.method == 'POST':
     password = request.POST['password']
     password_again = request.POST['password_again']
-    if password == password_again:
+    if password == password_again and form.is_valid():
       if request.session.has_key('tmp_id'):
         try:
           a = Account.objects.get(id=request.session['tmp_id'])
         except:
-          context = {'key': 'No se encuentra el usuario'}
+          context = {
+                'key': 'No se encuentra el usuario',
+                'if_form': False,
+                'player': total_pl(), 
+                'account': total_us(), 
+                'online': last_hour(), 
+                'actualmente': last_min(),
+          }
           return render(request, 'account/cambio_passwd.html', context)
         a.password = a.micryp(password)
         a.address = aleatorio(40)
         a.save()
         del request.session['tmp_id']
         context = {
-              'key': 'Password actualizado correctamente'
-              'if_form': False
+              'key': 'Password actualizado correctamente',
+              'if_form': False,
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
         }
         return render(request, 'account/cambio_passwd.html', context)
       else:
         context = {
-              'key': 'No existe la session temporal'
-              'if_form': False
+              'key': 'No existe la session temporal',
+              'if_form': False,
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
         }
         return render(request, 'account/cambio_passwd.html', context )
     else:
       context = {
         'if_form': True,
         'key':'Los password no coinciden',
+        'form': form,
+        'player': total_pl(), 
+        'account': total_us(), 
+        'online': last_hour(), 
+        'actualmente': last_min(),
       }
       return render(request, 'account/cambio_passwd.html', context)
