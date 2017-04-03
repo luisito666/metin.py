@@ -36,10 +36,22 @@ class Create(CreateView):
   model = Account 
   form_class = CreateUserForm
   def form_valid(self,form):
+    key = aleatorio(40)
     self.object = form.save(commit=False)
     new_password = self.object.micryp( self.object.password )	
     self.object.password = new_password 
+    self.object.address = key
     self.object.save()
+    try:
+      send_mail(
+              'Bienvenido Metin2 Kai',
+              'Content',              
+              settings.EMAIL_HOST_USER ,
+              [self.object.email], 
+              html_message=get_mail_register(self.object.login,key),            
+            )
+    except:
+      pass
     return HttpResponseRedirect( self.get_success_url() )
   def get_context_data(self, **kwargs):
         context = super(Create, self).get_context_data(**kwargs)
@@ -255,26 +267,14 @@ def recuperar_password(request):
         key = aleatorio(40)
         usuario.address = key
         usuario.token_expire = timezone.now() 
-        usuario.save()
-        mensaje ='<h3> Hola %s </h3>' % usuario.real_name
-        mensaje+='<p>has solicitado un email para recuperar el password </p>'
-        mensaje+='<p>para proceder usa el siguiente <a href="https://www1.metin2kai.co/password/%s">link</a> </p>' % key
-        mensaje+='<p>si no has solicitado el dicho cambio ignorar este correo </p>'
-        mensaje+='<p> Att: Staff <strong>Metin2kai </strong> </p>'
-        """send_mail(
-          'recuperacion de password',
-          mensaje, 
-          'soporte@metin2kai.co',
-          [usuario.email],
-          fail_silently=False,
-          )"""        
+        usuario.save()                
         try:
             send_mail(
               'Recuperar password',
               'Content',              
               settings.EMAIL_HOST_USER ,
               [usuario.email], 
-              html_message=mensaje,            
+              html_message=get_mail(usuario.real_name,key),            
             )
   
             context = {
@@ -417,3 +417,39 @@ def process_password(request,url):
         'actualmente': last_min(),
       }
       return render(request, 'account/cambio_passwd.html', context)
+
+def process_reg(request, url):
+  if request.method == 'GET':
+    if url:
+      try:
+        a = Account.objects.get(address=url)
+      except:
+        context = {'key': 'El token que instentas usar no existe.'}
+        return render(request, 'account/activar_cuenta.html', context)
+      if a.status == 'OK':
+        if a.availdt == "2009-01-01 00:00:00":
+          context = {'key': 'Tu cuenta ya esta activada'}
+          return render(request, 'account/activar_cuenta.html', context )
+        else:
+          a.availdt = "2009-01-01T00:00:00"
+          a.address = aleatorio(40)
+          a.save()
+
+          context = {'key': 'Tu cuenta se ha activado correctamente'}
+          return render(request, 'account/activar_cuenta.html', context )
+      else:
+        context = {'key', 'Tu cuenta esta baneada'}
+        return render(request, 'account/activar_cuenta.html', context )
+    else:
+      context = {'key': 'No has enviado ningun token'}
+      return render(request, 'account/activar_cuenta.html', context)
+  else:
+    context = {'key': 'Metodo no admitido'}
+    return render(request, 'account/activar_cuenta.html', context)
+
+
+
+
+
+      
+

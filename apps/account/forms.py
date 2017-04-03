@@ -80,7 +80,7 @@ class CreateUserForm(forms.ModelForm):
   real_name = forms.CharField(max_length=50, error_messages = ERROR_MESSAGES_GENERAL)
   email = forms.EmailField(max_length=30 , error_messages = ERROR_MESSAGES_EMAIL )
   social_id = forms.IntegerField( error_messages = ERROR_MESSAGES_GENERAL, validators = [valida_2, valida_3, valida_4])  
-  capcha = ReCaptchaField()
+  #capcha = ReCaptchaField()
 
   class Meta:
     model = Account
@@ -118,7 +118,7 @@ class CustomChangePassword(forms.Form):
 class ResPassword(forms.Form):
   login = forms.CharField(max_length=30, validators=[valida_5])
   email = forms.CharField(max_length=30, validators = [valida_5] ,error_messages = ERROR_MESSAGES_PASSWORD)
-  capcha = ReCaptchaField()
+  #capcha = ReCaptchaField()
   
 class FormResetPassword(forms.Form):
   password = forms.CharField(max_length=30, widget = forms.PasswordInput(), validators = [must_be_gt] ,error_messages = ERROR_MESSAGES_PASSWORD)

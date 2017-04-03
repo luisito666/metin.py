@@ -45,6 +45,32 @@ def aleatorio(cantidad):
 	retorno = p
 	return retorno
 
+def get_mail(nombre, key):
+	mensaje ='<h3> Hola %s </h3>' % nombre
+	mensaje+='<p>has solicitado un email para recuperar el password </p>'
+	mensaje+='<p>para proceder usa el siguiente <a href="https://www1.metin2kai.co/password/%s">link</a> </p>' % key
+	mensaje+='<p>si no has solicitado el dicho cambio ignorar este correo </p>'
+	mensaje+='<p> Att: Staff <strong>Metin2kai </strong> </p>'
+	return mensaje
+
+def get_mail_register(cuenta, key):
+	mensaje = '<h3> Bienvenido a Metin2 Kai. </h3>'
+	mensaje+= '<p>Por favor guarda este email para futuras referencias. La informacion de tu'
+	mensaje+= ' cuenta es la siguiente:</p>'
+	mensaje+= '----------------------------'
+	mensaje+= '<p>Nombre de usuario: %s </p>' % cuenta
+	mensaje+= '<p>URL del Sitio: http://www.metin2kai.co/ <p>'
+	mensaje+= '----------------------------'
+	mensaje+= '<p>Usa el siguiente link para activar tu cuenta: <a href="https://www1.metin2kai.co/activar/%s"> Activar </a> </p>' % key
+	mensaje+= '----------------------------'
+	mensaje+= '<p>Tu clave ha sido encriptada en nuestra base de datos. Si la olvidaste'
+	mensaje+= 'podras solicitar una nueva la cual sera activada en la misma forma que esta'
+	mensaje+= 'cuenta. </p>'
+	mensaje+= '<p> Gracias por registrarte. </p>'
+	mensaje+= '--'
+	mensaje+= '<p>Att: Staff Metin2 Kai </p>'
+	return mensaje
+
 """def token_time(now, token):
 	dia = (now - token).days
 	if dia >= 1:
