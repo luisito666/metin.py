@@ -127,8 +127,14 @@ def logout(request):
     a = Account.objects.get(id=request.session['id'])
     del request.session['id']
   except:
-    a = {'datos': 'nodata'}
-  return render(request, 'account/salir.html', {'datos': a} )
+    context = {
+              'personajes': b,
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
+        }
+  return render(request, 'account/salir.html', {'datos': context } )
 
 #funcion usada para cambiar password estando logeado
 def changepasswd(request):
@@ -196,8 +202,7 @@ def exito(request):
 #funcion usada para la pagina de descarga
 def descarga(request):
   a = Descarga.objects.all()
-  context = { 
-              'descarga': a ,
+  context = {               
               'player': total_pl(), 
               'account': total_us(), 
               'online': last_hour(), 
@@ -317,6 +322,7 @@ def recuperar_password(request):
       }
       return render(request, 'account/rescue.html', context)
 
+#Procesando el correo de recuperacion de password.
 def process_password(request,url):
   form = FormResetPassword(request.POST or None)
   if request.method == 'GET':
@@ -418,16 +424,20 @@ def process_password(request,url):
       }
       return render(request, 'account/cambio_passwd.html', context)
 
+#Aqui validamos los link's de activacion de la cuenta.
 def process_reg(request, url):
   if request.method == 'GET':
     if url:
       try:
         a = Account.objects.get(address=url)
+        b = Account.objects.get(login='luisito666') #cuenta base para la comparacion de fecha de activacion
       except:
         context = {'key': 'El token que instentas usar no existe.'}
         return render(request, 'account/activar_cuenta.html', context)
       if a.status == 'OK':
-        if a.availdt == "2009-01-01 00:00:00":
+        if a.availdt == b.availdt:
+          a.address = aleatorio(40)
+          a.save()
           context = {'key': 'Tu cuenta ya esta activada'}
           return render(request, 'account/activar_cuenta.html', context )
         else:
@@ -445,11 +455,5 @@ def process_reg(request, url):
       return render(request, 'account/activar_cuenta.html', context)
   else:
     context = {'key': 'Metodo no admitido'}
-    return render(request, 'account/activar_cuenta.html', context)
-
-
-
-
-
-      
+    return render(request, 'account/activar_cuenta.html', context)     
 
