@@ -196,7 +196,12 @@ def changepasswd(request):
 
 #Funcion usada para confirmar el registro exitoso
 def exito(request):
-  context = {}
+  context = {
+            'player': total_pl(), 
+            'account': total_us(), 
+            'online': last_hour(), 
+            'actualmente': last_min(),
+  }
   return render(request, 'account/exito.html', context)
 
 #funcion usada para la pagina de descarga
@@ -432,28 +437,64 @@ def process_reg(request, url):
         a = Account.objects.get(address=url)
         b = Account.objects.get(login='luisito666') #cuenta base para la comparacion de fecha de activacion
       except:
-        context = {'key': 'El token que instentas usar no existe.'}
+        context = {
+              'key': 'El token que instentas usar no existe.',
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
+        }
         return render(request, 'account/activar_cuenta.html', context)
       if a.status == 'OK':
         if a.availdt == b.availdt:
           a.address = aleatorio(40)
           a.save()
-          context = {'key': 'Tu cuenta ya esta activada'}
+          context = {
+              'key': 'Tu cuenta ya esta activada',
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
+          }
           return render(request, 'account/activar_cuenta.html', context )
         else:
           a.availdt = "2009-01-01T00:00:00"
           a.address = aleatorio(40)
           a.save()
 
-          context = {'key': 'Tu cuenta se ha activado correctamente'}
+          context = {
+              'key': 'Tu cuenta se ha activado correctamente',
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
+          }
           return render(request, 'account/activar_cuenta.html', context )
       else:
-        context = {'key', 'Tu cuenta esta baneada'}
+        context = {
+              'key': 'Tu cuenta esta baneada',
+              'player': total_pl(), 
+              'account': total_us(), 
+              'online': last_hour(), 
+              'actualmente': last_min(),
+        }
         return render(request, 'account/activar_cuenta.html', context )
     else:
-      context = {'key': 'No has enviado ningun token'}
+      context = {
+            'key': 'No has enviado ningun token',
+            'player': total_pl(), 
+            'account': total_us(), 
+            'online': last_hour(), 
+            'actualmente': last_min(),
+      }
       return render(request, 'account/activar_cuenta.html', context)
   else:
-    context = {'key': 'Metodo no admitido'}
+    context = {
+          'key': 'Metodo no admitido',
+          'player': total_pl(), 
+          'account': total_us(), 
+          'online': last_hour(), 
+          'actualmente': last_min(),
+    }
     return render(request, 'account/activar_cuenta.html', context)     
 
