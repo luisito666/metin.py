@@ -127,13 +127,15 @@ def logout(request):
     a = Account.objects.get(id=request.session['id'])
     del request.session['id']
   except:
-    context = {
+  	pass
+  b = Top.objects.filter(account_id=a.id)  
+  context = {
               'personajes': b,
               'player': total_pl(), 
               'account': total_us(), 
               'online': last_hour(), 
               'actualmente': last_min(),
-        }
+  }
   return render(request, 'account/salir.html', {'datos': context } )
 
 #funcion usada para cambiar password estando logeado
@@ -207,7 +209,8 @@ def exito(request):
 #funcion usada para la pagina de descarga
 def descarga(request):
   a = Descarga.objects.all()
-  context = {               
+  context = { 
+              'descarga': a,              
               'player': total_pl(), 
               'account': total_us(), 
               'online': last_hour(), 
